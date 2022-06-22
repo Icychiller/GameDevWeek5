@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Enemy
+  - Ground
+  - Obstacle
+  - Consumable
+  - Projectile
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - QuestionBox
+  - Water
+  - UI
+  - Front
+  - Obstacle
+  - Projectile
+  - Enemy
+  - Player
+  - Ground
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - BG0
+  - BG1
+  - BG2
+  - BG3
+  - BG4
+  - BG5
+  - BG6
+  - BG7
+  - BG8
+  - BG9
+  m_SortingLayers:
+  - name: Background2
+    uniqueID: 2485569821
+    locked: 0
+  - name: Background1
+    uniqueID: 2882300265
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
