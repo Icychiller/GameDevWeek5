@@ -16,6 +16,8 @@ public class GameConstants : ScriptableObject
     // World Values
     public float groundSurface = 0;
     public float maxCameraOffset = 3f;
+    public float floatingTextLifetime = 2f;
+    public float floatingSpeed = 0.05f;
 
     // Player Values
     public float maxSpeed = 10f;

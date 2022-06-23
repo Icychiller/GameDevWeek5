@@ -18,8 +18,9 @@ public class MomController : MonoBehaviour, EnemyInterface
     private AudioSource mushAudio;
     public Animator stompAnim;
     public GameObject enemyPrefab;
+    public CheapFloatingTextGenerator textGen;
 
-    private bool giveAway = true;
+    private bool giveAway = true;       // Defend against 1 attack
     private bool animPlaying = false;
 
     private bool stompCooldown = false;
@@ -31,8 +32,6 @@ public class MomController : MonoBehaviour, EnemyInterface
     {
         mushAnim = GetComponent<Animator>();
         mushAudio = GetComponent<AudioSource>();
-        StartCoroutine( startCooldownAggro(gameConstants.aggroTimer));
-        StartCoroutine( startCooldownSpawn(gameConstants.spawnCooldown));
     }
 
     public void takeDamage()
@@ -40,18 +39,23 @@ public class MomController : MonoBehaviour, EnemyInterface
         hp--;
         mushAudio.PlayOneShot(mushAudio.clip);
         hpPercent.SetValue(((float)hp)/maxHp);
+        textGen.GenerateText();
         if (!stompCooldown)
         {
-            triggerStomp();
-            StartCoroutine( startCooldownStomp(gameConstants.stompCooldown));
+            stompCooldown = true;
+            StartCoroutine(startCooldownStomp(gameConstants.stompCooldown));
         }
     }
 
     public void checkStomp()
     {
-        if(playOnGround.value)
+        Debug.Log("Entered Check");
+        if(playOnGround.value && !giveAway)
         {
             onPlayerDeath.Invoke();
+        } else if (giveAway)
+        {
+            giveAway = false;
         }
         
     }
@@ -59,30 +63,25 @@ public class MomController : MonoBehaviour, EnemyInterface
     // Update is called once per frame
     void Update()
     {
-       
-        if (!naturalAggro)
+        if (!stompCooldown)
         {
-            if (!stompCooldown)
-            {
-                triggerStomp();
-                StartCoroutine( startCooldownStomp(gameConstants.stompCooldown));
-            }
-            StartCoroutine(startCooldownAggro(gameConstants.aggroTimer));
+            Debug.Log("Enter Loop");
+            stompCooldown = true;
+            StartCoroutine(startCooldownStomp(gameConstants.stompCooldown));
         }
-        if(hp <= 0)
+        if (hp <= 0)
         {
             onDeath.Invoke();
-            playerScore.ApplyChange(10000);
+            playerScore.ApplyChange(99999);
             Destroy(gameObject);
         }
     }
 
-    
     void triggerStomp()
     {
         mushAnim.SetTrigger("Stomp");
         stompAnim.SetTrigger("Stomp");
-        
+        Debug.Log("Stomp Triggered");
     }
 
     IEnumerator startCooldownAggro(float cooldown)
@@ -93,17 +92,22 @@ public class MomController : MonoBehaviour, EnemyInterface
     }
     IEnumerator startCooldownStomp(float cooldown)
     {
-        stompCooldown = true;
+        Debug.Log ( "Entered Coroutine");
         animPlaying = true;
+        triggerStomp();
+        float timeTest = mushAnim.GetCurrentAnimatorStateInfo(0).length;
+        Debug.Log(timeTest.ToString());
+        // yield return new WaitUntil(()=> !mushAnim.GetCurrentAnimatorStateInfo(0).IsName("Base.MushIdle"));
+        Debug.Log("Passed Not Idle");
+        yield return new WaitUntil(()=> mushAnim.GetCurrentAnimatorStateInfo(0).IsName("MushIdle"));
+        Debug.Log("Passed Idle");
+        yield return new WaitForSeconds(timeTest);
         
-        yield return new WaitUntil(()=> mushAnim.GetCurrentAnimatorStateInfo(0).IsName("Base.MushIdle"));
         animPlaying = false;
-        if(!giveAway)
-            checkStomp();
+        checkStomp();
         yield return new WaitForSeconds(cooldown);
-        //checkStomp();
+        Debug.Log("Passed Cooldown");
         stompCooldown = false;
-        giveAway = false;
     }
     IEnumerator startCooldownSpawn(float cooldown)
     {
